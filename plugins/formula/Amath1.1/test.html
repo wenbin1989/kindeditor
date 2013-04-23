@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Amath</title>
+    <link rel="stylesheet" href=" style/jquery-ui-1.10.2.custom.css">
+    <link rel="stylesheet" href=" style/Amath.css">
+    <script src="script/jquery-1.9.1.js"></script>
+	<script src="script/textarea.js"></script>
+    <script src="script/jquery-ui-1.10.2.custom.js"></script>
+</head>
+<body xmlns:m="http://www.w3.org/1998/Math/MathML">
+<div id="main">
+	<div id="tabs"></div>
+</div>
+<div id="formula"><div class="seperate cursor">|</div></div>
+<div id="status"></div>
+<!--button>debug</button>
+<Amath:de></de>
+<script>
+function ttogglecursor(){
+	$("img").toggleClass("blinks");
+};
+self.setInterval("ttogglecursor()",300);
+$("button").click(function(){
+function disp(divs) {
+var a = [];
+for (var i = 0; i < divs.length; i++) {
+a.push(divs[i].innerHTML);
+}
+$("de").text(a.join(" "));
+}
+disp( $("#formula").toArray().reverse() );
+});
+</script-->
+<script src="script/Amath.js"></script>
+</body>
+</html>
