@@ -5,7 +5,7 @@
 * @author Roddy <luolonghao@gmail.com>
 * @website http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
-* @version 4.1.7 (2013-04-21)
+* @version 4.1.7 (2013-04-23)
 *******************************************************************************/
 (function (window, undefined) {
 	if (window.KindEditor) {
@@ -17,7 +17,7 @@ if (!window.console) {
 if (!console.log) {
 	console.log = function () {};
 }
-var _VERSION = '4.1.7 (2013-04-21)',
+var _VERSION = '4.1.7 (2013-04-23)',
 	_ua = navigator.userAgent.toLowerCase(),
 	_IE = _ua.indexOf('msie') > -1 && _ua.indexOf('opera') == -1,
 	_GECKO = _ua.indexOf('gecko') > -1 && _ua.indexOf('khtml') == -1,
@@ -3632,7 +3632,7 @@ _extend(KEdit, KWidget, {
 			});
 			if (_WEBKIT) {
 				K(doc).click(function(e) {
-					if (K(e.target).name === 'img') {
+					if (K(e.target).name === 'img' || K(e.target).name === 'object') {
 						cmd.selection(true);
 						cmd.range.selectNode(e.target);
 						cmd.select();
@@ -4506,6 +4506,23 @@ function _getImageFromRange(range, fn) {
 		return img;
 	}
 }
+function _getObjectFromRange(range, fn) {
+	if (range.collapsed) {
+		return;
+	}
+	range = range.cloneRange().up();
+	var sc = range.startContainer, so = range.startOffset;
+        if (!_WEBKIT && !range.isControl()) {
+            return;
+        }
+        var obj = K(sc.childNodes[so]);
+        if (!obj || obj.name != 'object') {
+            return;
+        }
+        if (fn(obj)) {
+            return obj;
+        }
+}
 function _bindContextmenuEvent() {
 	var self = this, doc = self.edit.doc;
 	K(doc).contextmenu(function(e) {
@@ -4978,7 +4995,31 @@ KEditor.prototype = {
 						self.hideMenu();
 					}
 				};
+				self._docDblclickFn = function (e) {
+					var img = self.plugin.getSelectedImage();
+					if (img) {
+						if (img[0].className == 'mathtype') {
+							self.loadPlugin('mathtype', function() {
+								self.plugin.mathtype.edit();
+							});
+						}
+						else {
+							self.loadPlugin('image', function() {
+								self.plugin.image.edit();
+							});
+						}
+					}
+					else {
+						var calc = self.plugin.getSelectedOnlineCalc();
+						if (calc) {
+							self.loadPlugin('onlineCalc', function() {
+								self.plugin.onlineCalc.edit();
+							});
+						}
+					}
+				};
 				K(edit.doc, document).mousedown(self._docMousedownFn);
+				K(edit.doc, document).dblclick(self._docDblclickFn);
 				_bindContextmenuEvent.call(self);
 				_bindNewlineEvent.call(self);
 				_bindTabEvent.call(self);
@@ -5643,7 +5684,12 @@ _plugin('core', function(K) {
 			return img[0].className == 'ke-anchor';
 		});
 	};
-	_each('link,image,flash,media,anchor'.split(','), function(i, name) {
+	self.plugin.getSelectedOnlineCalc = function () {
+		return _getObjectFromRange(self.edit.cmd.range, function (obj) {
+			return obj[0].type == 'application/x-qt-plugin';
+		});
+	};
+	_each('link,image,flash,media,anchor,onlineCalc'.split(','), function(i, name) {
 		var uName = name.charAt(0).toUpperCase() + name.substr(1);
 		_each('edit,delete'.split(','), function(j, val) {
 			self.addContextmenu({
@@ -5954,6 +6000,8 @@ KindEditor.lang({
 	yes : '确定',
 	no : '取消',
 	close : '关闭',
+	mathtype : '插入mathtype公式',
+	onlineCalc : '插入在线计算程序',
 	editImage : '图片属性',
 	deleteImage : '删除图片',
 	editFlash : 'Flash属性',
@@ -5964,6 +6012,8 @@ KindEditor.lang({
 	deleteLink : '取消超级链接',
 	editAnchor : '锚点属性',
 	deleteAnchor : '删除锚点',
+	editOnlineCalc: '在线计算程序属性',
+	deleteOnlineCalc: '删除在线计算程序',
 	tableprop : '表格属性',
 	tablecellprop : '单元格属性',
 	tableinsert : '插入表格',
@@ -6087,6 +6137,17 @@ KindEditor.lang({
 	'baidumap.search' : '搜索',
 	'baidumap.insertDynamicMap' : '插入动态地图',
 	'anchor.name' : '锚点名称',
+	'onlineCalc.console': '控制台程序',
+	'onlineCalc.matlab': 'matlab程序',
+	'onlineCalc.url': '执行程序',
+	'onlineCalc.input': '输入变量列表',
+	'onlineCalc.output': '输出变量列表',
+	'onlineCalc.plot': '图表变量列表',
+	'onlineCalc.upload': '上传',
+	'onlineCalc.viewServer': '文件空间',
+	'onlineCalc.size': '大小',
+	'onlineCalc.width': '宽',
+	'onlineCalc.height': '高',
 	'formatblock.formatBlock' : {
 		h1 : '标题 1',
 		h2 : '标题 2',
@@ -7282,7 +7343,39 @@ KindEditor.plugin('insertfile', function(K) {
 	self.clickToolbar(name, function() {
 		self.plugin.fileDialog({
 			clickFn : function(url, title) {
-				var html = '<a class="ke-insertfile" href="' + url + '" data-ke-src="' + url + '" target="_blank">' + title + '</a>';
+				var three = url.split(".");
+				var ext = three[three.length - 1];
+				var img;
+				var path = (self.insertfile || self.basePath + 'plugins/insertfile/images/');
+				switch (ext) {
+					case "doc":
+					case "docx":
+						img = path + 'word.png';
+						break;
+					case "xls":
+					case "xlsx":
+						img = path + 'execl.png';
+						break;
+					case "ppt":
+					case "pptx":
+						img = path + 'ppt.png';
+						break;
+					case "rar":
+					case "zip":
+					case "gz":
+					case "bz2":
+						img = path + 'rar_zip.png';
+						break;
+					case "txt":
+						img = path + 'txt.png';
+						break;
+					case "pdf":
+						img = path + 'pdf.png';
+						break;
+					default:
+						img = path + 'file.png';
+				}
+				var html = '<img style="width:30px; height:30px; vertical-align:middle; border:0;" src="' + img + '" />' + '<a class="ke-insertfile" href="' + url + '" data-ke-src="' + url + '" target="_blank">' + title + '</a>';
 				self.insertHtml(html).hideDialog().focus();
 			}
 		});

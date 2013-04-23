@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>KindEditor</title>
+		<link rel="stylesheet" href="themes/default/default.css" />
+		<script charset="utf-8" src="kindeditor-min.js"></script>
+		<script charset="utf-8" src="lang/zh_CN.js"></script>
+		<script>
+			var editor;
+			KindEditor.ready(function(K) {
+				editor = K.create('textarea[name="content"]', {
+					items : [
+						'source', '|', 'undo', 'redo', '|', 'preview', 'print', 'template', 'code', 'cut', 'copy', 'paste',
+						'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+						'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+						'superscript', 'clearhtml', 'quickformat', 'selectall', 'baidumap', 'pagebreak', '/',
+						'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+						'italic', 'underline', 'strikethrough', 'lineheight', 'removeformat', '|', 'image', 'multiimage',
+						'mathtype', 'onlineCalc', 'flash', 'media', 'insertfile', 'table', 'hr', 'emoticons',
+						'anchor', 'link', 'unlink', '|', 'about'
+					],
+					filterMode : false,
+					langType : 'zh_CN',
+					fullscreenMode : true,
+					allowFileManager : true,
+					insertfile : '/kindeditor4.0/plugins/insertfile/images/',
+					emoticonsPath : '/kindeditor4.0/plugins/emoticons/images/',
+				});
+			});
+
+			function getHtml() {
+				return editor.html();
+			}
+			function setHtml(val) {
+				editor.html(val);
+				editor.initContent = editor.html();
+			}
+			function selectedHtml() {
+				return editor.selectedHtml();
+			}
+			function insertHtml(val) {
+				editor.insertHtml(val);
+			}
+			function insertFormula(val) {
+				var url = KindEditor.formatUrl(val, 'absolute');
+				var image = new Image();
+				var html = '<img style="vertical-align:middle;" class="mathtype" src="' + url + '" />';
+				insertHtml(html);
+			}
+			function focus() {
+				editor.focus();
+			}
+			function isDirty() {
+				return editor.isDirty();
+			}
+		</script>
+	</head>
+
+	<body>
+		<textarea name="content" style="width:700px;height:200px;visibility:hidden;"></textarea>
+	</body>
+</html>

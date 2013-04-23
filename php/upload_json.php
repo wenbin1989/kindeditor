@@ -21,10 +21,11 @@ $ext_arr = array(
 	'image' => array('gif', 'jpg', 'jpeg', 'png', 'bmp'),
 	'flash' => array('swf', 'flv'),
 	'media' => array('swf', 'flv', 'mp3', 'wav', 'wma', 'wmv', 'mid', 'avi', 'mpg', 'asf', 'rm', 'rmvb'),
-	'file' => array('doc', 'docx', 'xls', 'xlsx', 'ppt', 'htm', 'html', 'txt', 'zip', 'rar', 'gz', 'bz2'),
+	'file' => array('doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'htm', 'html', 'txt', 'pdf', 'zip', 'rar', 'gz', 'bz2'),
+	'onlineCalc' => array('exe', 'm', 'p', 'zip'),
 );
 //最大文件大小
-$max_size = 1000000;
+$max_size = 50000000;
 
 $save_path = realpath($save_path) . '/';
 

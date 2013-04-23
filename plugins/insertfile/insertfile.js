@@ -130,7 +130,39 @@ KindEditor.plugin('insertfile', function(K) {
 	self.clickToolbar(name, function() {
 		self.plugin.fileDialog({
 			clickFn : function(url, title) {
-				var html = '<a class="ke-insertfile" href="' + url + '" data-ke-src="' + url + '" target="_blank">' + title + '</a>';
+				var three = url.split(".");
+				var ext = three[three.length - 1];
+				var img;
+				var path = (self.insertfile || self.basePath + 'plugins/insertfile/images/');
+				switch (ext) {
+					case "doc":
+					case "docx":
+						img = path + 'word.png';
+						break;
+					case "xls":
+					case "xlsx":
+						img = path + 'execl.png';
+						break;
+					case "ppt":
+					case "pptx":
+						img = path + 'ppt.png';
+						break;
+					case "rar":
+					case "zip":
+					case "gz":
+					case "bz2":
+						img = path + 'rar_zip.png';
+						break;
+					case "txt":
+						img = path + 'txt.png';
+						break;
+					case "pdf":
+						img = path + 'pdf.png';
+						break;
+					default:
+						img = path + 'file.png';
+				}
+				var html = '<img style="width:30px; height:30px; vertical-align:middle; border:0;" src="' + img + '" />' + '<a class="ke-insertfile" href="' + url + '" data-ke-src="' + url + '" target="_blank">' + title + '</a>';
 				self.insertHtml(html).hideDialog().focus();
 			}
 		});

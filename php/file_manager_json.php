@@ -21,7 +21,7 @@ $ext_arr = array('gif', 'jpg', 'jpeg', 'png', 'bmp');
 
 //目录名
 $dir_name = empty($_GET['dir']) ? '' : trim($_GET['dir']);
-if (!in_array($dir_name, array('', 'image', 'flash', 'media', 'file'))) {
+if (!in_array($dir_name, array('', 'image', 'flash', 'media', 'file', 'onlineCalc'))) {
 	echo "Invalid Directory name.";
 	exit;
 }

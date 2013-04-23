@@ -76,6 +76,25 @@ function _getImageFromRange(range, fn) {
 	}
 }
 
+// 当前range为object时返回KNode，否则返回undefined
+function _getObjectFromRange(range, fn) {
+	if (range.collapsed) {
+		return;
+	}
+	range = range.cloneRange().up();
+	var sc = range.startContainer, so = range.startOffset;
+        if (!_WEBKIT && !range.isControl()) {
+            return;
+        }
+        var obj = K(sc.childNodes[so]);
+        if (!obj || obj.name != 'object') {
+            return;
+        }
+        if (fn(obj)) {
+            return obj;
+        }
+}
+
 function _bindContextmenuEvent() {
 	var self = this, doc = self.edit.doc;
 	K(doc).contextmenu(function(e) {
@@ -581,7 +600,31 @@ KEditor.prototype = {
 						self.hideMenu();
 					}
 				};
+				self._docDblclickFn = function (e) {
+					var img = self.plugin.getSelectedImage();
+					if (img) {
+						if (img[0].className == 'mathtype') {
+							self.loadPlugin('mathtype', function() {
+								self.plugin.mathtype.edit();
+							});
+						}
+						else {
+							self.loadPlugin('image', function() {
+								self.plugin.image.edit();
+							});
+						}
+					}
+					else {
+						var calc = self.plugin.getSelectedOnlineCalc();
+						if (calc) {
+							self.loadPlugin('onlineCalc', function() {
+								self.plugin.onlineCalc.edit();
+							});
+						}
+					}
+				};
 				K(edit.doc, document).mousedown(self._docMousedownFn);
+				K(edit.doc, document).dblclick(self._docDblclickFn);
 				_bindContextmenuEvent.call(self);
 				_bindNewlineEvent.call(self);
 				_bindTabEvent.call(self);
@@ -1279,7 +1322,7 @@ _plugin('core', function(K) {
 			body : html
 		});
 	});
-	// link,image,flash,media,anchor
+	// link,image,flash,media,anchor,onlineCalc
 	self.plugin.getSelectedLink = function() {
 		return self.cmd.commonAncestor('a');
 	};
@@ -1303,7 +1346,12 @@ _plugin('core', function(K) {
 			return img[0].className == 'ke-anchor';
 		});
 	};
-	_each('link,image,flash,media,anchor'.split(','), function(i, name) {
+	self.plugin.getSelectedOnlineCalc = function () {
+		return _getObjectFromRange(self.edit.cmd.range, function (obj) {
+			return obj[0].type == 'application/x-qt-plugin';
+		});
+	};
+	_each('link,image,flash,media,anchor,onlineCalc'.split(','), function(i, name) {
 		var uName = name.charAt(0).toUpperCase() + name.substr(1);
 		_each('edit,delete'.split(','), function(j, val) {
 			self.addContextmenu({
