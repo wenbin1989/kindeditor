@@ -1,0 +1,61 @@
+#tabs{
+	width:100%;
+	height:200px;
+}
+#formula{
+	background-color: yellow;
+	width:100%;
+	height:200px;
+}
+#status{
+	background-color: blue;
+	width:100%;
+	height:30px;
+}
+.cursor {
+	width:1px;
+	height:10px;
+	background-color:blue;
+}
+.cursor.blink {
+	visibility: hidden;
+}
+.blinks{
+	visibility: hidden;
+}
+div.emptybox{
+	width:30px;
+	height:30px;
+	display: inline;
+	background-color:gray;
+	border:2px blue solid;
+}
+div.box{
+	width:30px;
+	height:30px;
+	margin:2px;
+	float:left;
+	display:inline;
+	border:2px blue solid;
+	text-align:center;
+}
+div.boxm{
+	width:100px;
+	height:100px;
+	margin:2px;
+	float:left;
+	display:inline;
+	border:2px blue solid;
+	text-align:center;
+}
+div.seperate{
+	display:inline;
+	width:1px;
+	height:9px;
+}
+.focused {
+	background: #abcdef;
+}
+.mouseover{
+	background-color:yellow;
+}
