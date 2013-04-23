@@ -5,7 +5,7 @@
 * @author Roddy <luolonghao@gmail.com>
 * @website http://www.kindsoft.net/
 * @licence http://www.kindsoft.net/license.php
-* @version 4.1.7 (2013-09-04)
+* @version 4.1.7 (2013-09-11)
 *******************************************************************************/
 (function (window, undefined) {
 	if (window.KindEditor) {
@@ -17,7 +17,7 @@ if (!window.console) {
 if (!console.log) {
 	console.log = function () {};
 }
-var _VERSION = '4.1.7 (2013-09-04)',
+var _VERSION = '4.1.7 (2013-09-11)',
 	_ua = navigator.userAgent.toLowerCase(),
 	_IE = _ua.indexOf('msie') > -1 && _ua.indexOf('opera') == -1,
 	_GECKO = _ua.indexOf('gecko') > -1 && _ua.indexOf('khtml') == -1,
@@ -3648,7 +3648,7 @@ _extend(KEdit, KWidget, {
 			});
 			if (_WEBKIT) {
 				K(doc).click(function(e) {
-					if (K(e.target).name === 'img') {
+					if (K(e.target).name === 'img' || K(e.target).name === 'object') {
 						cmd.selection(true);
 						cmd.range.selectNode(e.target);
 						cmd.select();
@@ -4522,6 +4522,25 @@ function _getImageFromRange(range, fn) {
 		return img;
 	}
 }
+
+function _getObjectFromRange(range, fn) {
+	if (range.collapsed) {
+		return;
+	}
+	range = range.cloneRange().up();
+	var sc = range.startContainer, so = range.startOffset;
+	if (!_WEBKIT && !range.isControl()) {
+	    return;
+	}
+	var obj = K(sc.childNodes[so]);
+	if (!obj || obj.name != 'object') {
+	    return;
+	}
+	if (fn(obj)) {
+	    return obj;
+	}
+}
+
 function _bindContextmenuEvent() {
 	var self = this, doc = self.edit.doc;
 	K(doc).contextmenu(function(e) {
@@ -4994,7 +5013,31 @@ KEditor.prototype = {
 						self.hideMenu();
 					}
 				};
+				self._docDblclickFn = function (e) {
+					var img = self.plugin.getSelectedImage();
+					if (img) {
+						if (img[0].className == 'mathtype') {
+							self.loadPlugin('mathtype', function() {
+								self.plugin.mathtype.edit();
+							});
+						}
+						else {
+							self.loadPlugin('image', function() {
+								self.plugin.image.edit();
+							});
+						}
+					}
+					else {
+						var calc = self.plugin.getSelectedOnlineCalc();
+						if (calc) {
+							self.loadPlugin('onlineCalc', function() {
+								self.plugin.onlineCalc.edit();
+							});
+						}
+					}
+				};
 				K(edit.doc, document).mousedown(self._docMousedownFn);
+				K(edit.doc, document).dblclick(self._docDblclickFn);
 				_bindContextmenuEvent.call(self);
 				_bindNewlineEvent.call(self);
 				_bindTabEvent.call(self);
@@ -5657,6 +5700,7 @@ _plugin('core', function(K) {
 			body : html
 		});
 	});
+
 	self.plugin.getSelectedLink = function() {
 		return self.cmd.commonAncestor('a');
 	};
@@ -5680,7 +5724,12 @@ _plugin('core', function(K) {
 			return img[0].className == 'ke-anchor';
 		});
 	};
-	_each('link,image,flash,media,anchor'.split(','), function(i, name) {
+	self.plugin.getSelectedOnlineCalc = function () {
+		return _getObjectFromRange(self.edit.cmd.range, function (obj) {
+			return obj[0].type == 'application/x-qt-plugin';
+		});
+	};
+	_each('link,image,flash,media,anchor,onlineCalc'.split(','), function(i, name) {
 		var uName = name.charAt(0).toUpperCase() + name.substr(1);
 		_each('edit,delete'.split(','), function(j, val) {
 			self.addContextmenu({

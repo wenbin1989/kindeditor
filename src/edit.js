@@ -154,7 +154,7 @@ _extend(KEdit, KWidget, {
 			// [WEBKIT] select an image after click the image
 			if (_WEBKIT) {
 				K(doc).click(function(e) {
-					if (K(e.target).name === 'img') {
+					if (K(e.target).name === 'img' || K(e.target).name === 'object') {
 						cmd.selection(true);
 						cmd.range.selectNode(e.target);
 						cmd.select();
