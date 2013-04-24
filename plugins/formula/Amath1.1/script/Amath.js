@@ -1,3 +1,11 @@
+/*********************************************************
+*	A mathml editor on web
+*  Copyright (C) 2012-2013  FangBolang
+*
+* @author: Boalng Fang
+* @Email: bolangfang@yahoo.com
+* @Work Unit: School of Aero School, Tsinghua
+************************************************************/
 var A = {
 	symbles:{
 		mainmenu: {menu:["mo1","mo2","mi","matrix","operate"],},
