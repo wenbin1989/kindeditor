@@ -6884,6 +6884,9 @@ KindEditor.plugin('flash', function(K) {
 							heightBox[0].focus();
 							return;
 						}
+						if (/\.(flv)(\?|$)/i.test(url)) {
+							url = 'vcastr22.swf?vcastr_file=' + url;
+						}
 						var html = K.mediaImg(self.themesPath + 'common/blank.gif', {
 								src : url,
 								type : K.mediaType('.swf'),
@@ -6962,7 +6965,11 @@ KindEditor.plugin('flash', function(K) {
 			var img = self.plugin.getSelectedFlash();
 			if (img) {
 				var attrs = K.mediaAttrs(img.attr('data-ke-tag'));
-				urlBox.val(attrs.src);
+				var url = attrs.src;
+				if (/\.(flv)(\?|$)/i.test(url)) {
+					url = url.replace('vcastr22.swf?vcastr_file=', '');
+				}
+				urlBox.val(url);
 				widthBox.val(K.removeUnit(img.css('width')) || attrs.width || 0);
 				heightBox.val(K.removeUnit(img.css('height')) || attrs.height || 0);
 			}
@@ -7780,6 +7787,9 @@ KindEditor.plugin('media', function(K) {
 							heightBox[0].focus();
 							return;
 						}
+						if (/\.(flv)(\?|$)/i.test(url)) {
+							url = 'vcastr22.swf?vcastr_file=' + url;
+						}
 						var html = K.mediaImg(self.themesPath + 'common/blank.gif', {
 								src : url,
 								type : K.mediaType(url),
@@ -7860,7 +7870,11 @@ KindEditor.plugin('media', function(K) {
 			var img = self.plugin.getSelectedMedia();
 			if (img) {
 				var attrs = K.mediaAttrs(img.attr('data-ke-tag'));
-				urlBox.val(attrs.src);
+				var url = attrs.src;
+				if (/\.(flv)(\?|$)/i.test(url)) {
+					url = url.replace('vcastr22.swf?vcastr_file=', '');
+				}
+				urlBox.val(url);
 				widthBox.val(K.removeUnit(img.css('width')) || attrs.width || 0);
 				heightBox.val(K.removeUnit(img.css('height')) || attrs.height || 0);
 				autostartBox[0].checked = (attrs.autostart === 'true');
